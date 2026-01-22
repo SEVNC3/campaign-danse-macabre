@@ -1,0 +1,13 @@
+// ============================================
+// DANSE MACABRE - Death's Door Passives
+// ============================================
+
+// Passive that triggers at turn start when entity has DEATHS_DOOR
+// Applies a marker status that Lua catches to trigger the actual save
+new entry "Passive_DeathsDoor_TurnSave"
+type "PassiveData"
+data "Properties" "IsHidden"
+data "StatsFunctorContext" "OnTurn"
+data "Conditions" "HasStatus('DEATHS_DOOR')"
+data "StatsFunctors" "ApplyStatus(SELF,DEATHS_DOOR_TURN_MARKER,100,0)"
+

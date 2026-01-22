@@ -1,0 +1,222 @@
+// ============================================
+// DANSE MACABRE - Death's Door System
+// ============================================
+
+// DEATHS_DOOR_ENABLER - Always-on boost that intercepts 0 HP
+new entry "DEATHS_DOOR_ENABLER"
+type "StatusData"
+data "StatusType" "BOOST"
+data "Boosts" "DownedStatus(DEATHS_DOOR_CHECK, 15)"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+
+// DEATHS_DOOR_CHECK - Triggers on 0 HP, auto-enters Death's Door (no initial save)
+// Removing OnApplyRoll eliminates combat log "against ." issue
+// First real save happens on turn start via DEATHS_DOOR_SAVE_DC_X
+// NOTE: DC_8 is NOT applied here - Lua handles DC initialization to prevent reset on re-triggers
+new entry "DEATHS_DOOR_CHECK"
+type "StatusData"
+data "StatusType" "DOWNED"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a001;1"
+data "Icon" "Status_Downed"
+data "OnApplyFunctors" "RegainHitPoints(1);ApplyStatus(DEATHS_DOOR,100,-1)"
+data "OnRemoveFunctors" "ResetCombatTurn();RestoreResource(ActionPoint,100%,0);RestoreResource(BonusActionPoint,100%,0);RestoreResource(Movement,50%,0);RestoreResource(ReactionActionPoint,100%,0)"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+data "HideOverheadUI" "1"
+
+// DEATHS_DOOR - Active status while fighting at death's edge
+// Turn saves handled by Passive_DeathsDoor_TurnSave (applies marker)
+// Invulnerable() prevents damage without showing "(0)" floating text
+new entry "DEATHS_DOOR"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a002;1"
+data "Description" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a003;1"
+data "Icon" "GenericIcon_DamageType_Necrotic"
+data "FormatColor" "Red"
+data "RemoveEvents" "OnCombatEnded"
+data "StatusPropertyFlags" "ForceOverhead"
+data "StillAnimationType" "Weakened"
+data "StillAnimationPriority" "Weakened"
+data "StatusEffect" "a0f74dff-7074-45aa-a4d2-a131d7f328f5"
+data "Boosts" "Invulnerable()"
+
+// DEATHS_DOOR_TURN_MARKER - Applied at start of turn, Lua catches this
+new entry "DEATHS_DOOR_TURN_MARKER"
+type "StatusData"
+data "StatusType" "BOOST"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+
+// ============================================
+// SAVE TRIGGER STATUSES - Each DC level with dice roll animation
+// These are applied by Lua and show the actual save UI
+// ============================================
+
+new entry "DEATHS_DOOR_SAVE_DC_8"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a010;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 8)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_DC_10"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a011;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 10)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_DC_12"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a012;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 12)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_DC_14"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a013;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 14)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_DC_16"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a014;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 16)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_DC_18"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a015;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 18)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_DC_20"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a016;1"
+data "TooltipSave" "Constitution"
+data "OnApplyRoll" "SavingThrow(Ability.Constitution, 20)"
+data "OnApplySuccess" "ApplyStatus(DEATHS_DOOR_SAVE_PASSED,100,1)"
+data "OnApplyFail" "ApplyStatus(DEATHS_DOOR_SAVE_FAILED,100,1)"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableCombatlog;DisablePortraitIndicator"
+
+// ============================================
+// SAVE RESULT MARKERS - Lua catches these to handle outcomes
+// ============================================
+
+new entry "DEATHS_DOOR_SAVE_PASSED"
+type "StatusData"
+data "StatusType" "BOOST"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHS_DOOR_SAVE_FAILED"
+type "StatusData"
+data "StatusType" "BOOST"
+data "TickType" "EndTurn"
+data "RemoveEvents" "OnTurn"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+
+// ============================================
+// COMBAT RESURRECTION BLOCK
+// Applied to dead party members, auto-removes when combat ends
+// ============================================
+
+new entry "BLOCK_RESURRECTION_COMBAT"
+type "StatusData"
+data "StatusType" "BOOST"
+data "Boosts" "Tag(BLOCK_RESURRECTION)"
+data "RemoveEvents" "OnCombatEnded"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+
+// ============================================
+// DC Tracking Statuses - Use StackId so only one can be active
+// ============================================
+
+new entry "DEATHS_DOOR_DC_8"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "8"
+
+new entry "DEATHS_DOOR_DC_10"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "10"
+
+new entry "DEATHS_DOOR_DC_12"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "12"
+
+new entry "DEATHS_DOOR_DC_14"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "14"
+
+new entry "DEATHS_DOOR_DC_16"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "16"
+
+new entry "DEATHS_DOOR_DC_18"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "18"
+
+new entry "DEATHS_DOOR_DC_20"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+data "StackId" "DEATHS_DOOR_DC"
+data "StackPriority" "20"
+
