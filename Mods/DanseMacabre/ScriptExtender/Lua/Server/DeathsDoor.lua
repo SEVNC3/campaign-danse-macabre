@@ -673,6 +673,7 @@ function DeathsDoor.Init()
         processingEntities = {}
         killingEntities = {}
         currentTurnEntity = nil
+        currentControlled = nil
     end)
 
     _P("[DanseMacabre] Death's Door module initialized")
