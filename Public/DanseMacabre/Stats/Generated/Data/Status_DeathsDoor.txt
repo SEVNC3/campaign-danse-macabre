@@ -220,3 +220,22 @@ data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndi
 data "StackId" "DEATHS_DOOR_DC"
 data "StackPriority" "20"
 
+// ============================================
+// AUDIO FEEDBACK STATUSES - Applied when Death's Door character is selected
+// Layered soundscape: heartbeat + tension ambience
+// ============================================
+
+new entry "DEATHSDOOR_FEEDBACK"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StackId" "DEATHSDOOR_FEEDBACK"
+data "SoundLoop" "GLO_OathbreakerKnight_FirstAppearance_HeartbeatLOOP"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+
+new entry "DEATHSDOOR_FEEDBACK_TENSION"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StackId" "DEATHSDOOR_FEEDBACK_TENSION"
+data "SoundLoop" "Spell_Prepare_BarbarianRage_L1to3"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
+

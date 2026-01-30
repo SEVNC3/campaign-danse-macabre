@@ -27,8 +27,13 @@ local SAVE_STATUSES = {
     [20] = "DEATHS_DOOR_SAVE_DC_20"
 }
 
--- Bell sound for death saves
-local BELL_SOUND = "Spell_Status_Hex_Enter"
+-- Death knell sounds (different for success vs failure)
+local SOUND_SAVE_PASSED = "CrSpell_Impact_Raven_BadOmen"  -- Resisted Death
+local SOUND_SAVE_FAILED = "CrSpell_Impact_DeathShriek"    -- Succumbed to Death
+
+-- Feedback status names
+local FEEDBACK_STATUS = "DEATHSDOOR_FEEDBACK"
+local FEEDBACK_TENSION_STATUS = "DEATHSDOOR_FEEDBACK_TENSION"
 
 -- Turn trigger passive
 local TURN_SAVE_PASSIVE = "Passive_DeathsDoor_TurnSave"
@@ -44,6 +49,9 @@ local killingEntities = {}
 
 -- Track whose turn it is (to filter DoT damage from direct attacks)
 local currentTurnEntity = nil
+
+-- Track currently controlled character for audio feedback
+local currentControlled = nil
 
 --- Extract UUID from entity identifier
 --- @param entity string Entity identifier (may be full name or just UUID)
@@ -65,6 +73,35 @@ local function GetDisplayName(entity)
         return name
     end
     return "Unknown"
+end
+
+--- Apply audio feedback statuses (layered heartbeat + tension)
+--- @param entity string Entity GUID
+local function ApplyFeedbackStatuses(entity)
+    pcall(function()
+        Osi.ApplyStatus(entity, FEEDBACK_STATUS, -1, 1)
+        Osi.ApplyStatus(entity, FEEDBACK_TENSION_STATUS, -1, 1)
+    end)
+end
+
+--- Remove audio feedback statuses
+--- @param entity string Entity GUID
+local function RemoveFeedbackStatuses(entity)
+    pcall(function()
+        if Osi.HasActiveStatus(entity, FEEDBACK_STATUS) == 1 then
+            Osi.RemoveStatus(entity, FEEDBACK_STATUS)
+        end
+        if Osi.HasActiveStatus(entity, FEEDBACK_TENSION_STATUS) == 1 then
+            Osi.RemoveStatus(entity, FEEDBACK_TENSION_STATUS)
+        end
+    end)
+end
+
+--- Check if entity has Death's Door status
+--- @param entity string Entity GUID
+--- @return boolean hasStatus
+local function HasDeathsDoorStatus(entity)
+    return Osi.HasActiveStatus(entity, "DEATHS_DOOR") == 1
 end
 
 --- Check if Death's Door should apply to all combatants (MCM setting)
@@ -190,11 +227,16 @@ function DeathsDoor.IncrementDC(entity)
     return nextDC
 end
 
---- Play the death's door bell sound
+--- Play the death knell sound based on save result
 --- @param entity string Entity GUID
-function DeathsDoor.PlayBellSound(entity)
+--- @param passed boolean Whether the save passed
+function DeathsDoor.PlayDeathKnell(entity, passed)
     pcall(function()
-        Osi.PlaySound(entity, BELL_SOUND)
+        if passed then
+            Osi.PlaySound(entity, SOUND_SAVE_PASSED)
+        else
+            Osi.PlaySound(entity, SOUND_SAVE_FAILED)
+        end
     end)
 end
 
@@ -248,9 +290,6 @@ function DeathsDoor.TriggerSave(entity, reason)
         return
     end
 
-    -- Play bell sound
-    DeathsDoor.PlayBellSound(entity)
-
     _P("[DanseMacabre] " .. reason .. " - Triggering save (DC " .. dc .. ") for " .. entityUUID)
 
     -- Apply the save trigger status - this shows the dice roll
@@ -263,6 +302,9 @@ function DeathsDoor.OnSavePassed(entity)
     local entityUUID = ExtractUUID(entity)
 
     _P("[DanseMacabre] Entity RESISTED DEATH!")
+
+    -- Play death knell sound (Resisted Death)
+    DeathsDoor.PlayDeathKnell(entity, true)
 
     -- Show floating text using Grimoire
     DeathsDoor.ShowFloatingText(entity, true)
@@ -288,6 +330,9 @@ function DeathsDoor.OnSaveFailed(entity)
     _P("[DanseMacabre] DEBUG OnSaveFailed:")
     _P("[DanseMacabre]     HP at fail time: " .. tostring(hp))
     _P("[DanseMacabre]     Has DEATHS_DOOR_ENABLER: " .. tostring(Osi.HasActiveStatus(entity, "DEATHS_DOOR_ENABLER")))
+
+    -- Play death knell sound (Succumbed to Death)
+    DeathsDoor.PlayDeathKnell(entity, false)
 
     -- Show floating text using Grimoire
     DeathsDoor.ShowFloatingText(entity, false)
@@ -416,6 +461,21 @@ end
 function DeathsDoor.Init()
     _P("[DanseMacabre] Initializing Death's Door module...")
 
+    -- Selection-based audio feedback: apply feedback when Death's Door character is selected
+    Ext.Osiris.RegisterListener("GainedControl", 1, "after", function(character)
+        -- Remove feedback from previous controlled character
+        if currentControlled and currentControlled ~= character then
+            RemoveFeedbackStatuses(currentControlled)
+        end
+
+        -- Apply feedback if new character is at Death's Door
+        if HasDeathsDoorStatus(character) then
+            ApplyFeedbackStatuses(character)
+        end
+
+        currentControlled = character
+    end)
+
     -- Listen for DEATHS_DOOR status being applied (successful initial save)
     Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(target, status, causee, _)
         -- DEBUG: Log ALL Death's Door related statuses
@@ -465,6 +525,13 @@ function DeathsDoor.Init()
             Ext.Timer.WaitFor(100, function()
                 Osi.RemoveStatus(target, "DEATHS_DOOR_CHECK")
             end)
+
+            -- Apply audio feedback if this character is currently controlled
+            local targetUUID = ExtractUUID(target)
+            local controlledUUID = currentControlled and ExtractUUID(currentControlled) or nil
+            if controlledUUID and targetUUID == controlledUUID then
+                ApplyFeedbackStatuses(target)
+            end
         end
 
         -- Listen for turn marker (passive applied it at turn start)
@@ -510,6 +577,9 @@ function DeathsDoor.Init()
             pcall(function()
                 Osi.RemovePassive(target, TURN_SAVE_PASSIVE)
             end)
+
+            -- Remove audio feedback
+            RemoveFeedbackStatuses(target)
         end
     end)
 
@@ -592,6 +662,11 @@ function DeathsDoor.Init()
     -- Clean up tracking when combat ends
     Ext.Osiris.RegisterListener("CombatEnded", 1, "after", function(combat)
         _P("[DanseMacabre] Combat ended, clearing Death's Door tracking")
+
+        -- Remove feedback from any entities that had it
+        if currentControlled then
+            RemoveFeedbackStatuses(currentControlled)
+        end
 
         -- Clear all tracking tables
         entitiesInDeathsDoor = {}
