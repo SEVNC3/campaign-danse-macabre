@@ -156,18 +156,6 @@ data "RemoveEvents" "OnTurn"
 data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
 
 // ============================================
-// COMBAT RESURRECTION BLOCK
-// Applied to dead party members, auto-removes when combat ends
-// ============================================
-
-new entry "BLOCK_RESURRECTION_COMBAT"
-type "StatusData"
-data "StatusType" "BOOST"
-data "Boosts" "Tag(BLOCK_RESURRECTION)"
-data "RemoveEvents" "OnCombatEnded"
-data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator"
-
-// ============================================
 // DC Tracking Statuses - Use StackId so only one can be active
 // ============================================
 

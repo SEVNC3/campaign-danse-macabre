@@ -299,8 +299,6 @@ end
 --- Handle save passed (called when DEATHS_DOOR_SAVE_PASSED is applied)
 --- @param entity string Entity GUID
 function DeathsDoor.OnSavePassed(entity)
-    local entityUUID = ExtractUUID(entity)
-
     _P("[DanseMacabre] Entity RESISTED DEATH!")
 
     -- Play death knell sound (Resisted Death)
@@ -323,7 +321,6 @@ end
 --- Handle save failed (called when DEATHS_DOOR_SAVE_FAILED is applied)
 --- @param entity string Entity GUID
 function DeathsDoor.OnSaveFailed(entity)
-    local entityUUID = ExtractUUID(entity)
     local hp = Osi.GetHitpoints(entity) or "?"
 
     _P("[DanseMacabre] Entity SUCCUMBED TO DEATH!")
@@ -339,7 +336,6 @@ function DeathsDoor.OnSaveFailed(entity)
 
     -- Delay death briefly - just enough for "Succumbed to Death!" text to display
     local capturedEntity = entity
-    local capturedUUID = entityUUID
     Ext.Timer.WaitFor(600, function()
         -- Check if entity recovered before killing (healed during the 600ms window)
         if Osi.HasActiveStatus(capturedEntity, "DEATHS_DOOR") ~= 1 then
