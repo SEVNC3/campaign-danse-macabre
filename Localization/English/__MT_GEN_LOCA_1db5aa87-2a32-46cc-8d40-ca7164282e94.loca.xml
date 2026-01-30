@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contentList>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a001" version="1">Death Save</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a002" version="1">Death's Door</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a003" version="1">Clinging to life at death's edge. Must make Constitution saving throws each turn and when taking damage. Each save increases the DC. Failure means instant death with no resurrection until combat ends.</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a004" version="1">Resisted Death!</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a005" version="1">Succumbed to Death!</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a010" version="1">Death's Grasp (DC 8)</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a011" version="1">Death's Grasp (DC 10)</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a012" version="1">Death's Grasp (DC 12)</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a013" version="1">Death's Grasp (DC 14)</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a014" version="1">Death's Grasp (DC 16)</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a015" version="1">Death's Grasp (DC 18)</content>
+	<content contentuid="hd4a5e6b7g8c9dg4e0fga1b2gc3d4e5f6a016" version="1">Death's Grasp (DC 20)</content>
+</contentList>
